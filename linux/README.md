@@ -1,6 +1,7 @@
 # Ansible Ubuntu Setup
 
 Installs packages and plugins relevant to an engineer working with Kubernetes.
+Leverages the use of Ansible and Homebrew to install tools.
 
 ## Features
 
@@ -38,6 +39,8 @@ Packages and plugins:
 sudo apt update -y && sudo apt install dos2unix && find . -type f -exec dos2unix {} \; && bash bootstrap.sh
 ```
 
+1. After installation reopen your terminal for changes to take effect.
+
 ### WSL
 
 1. Download or clone this repo
@@ -54,3 +57,15 @@ Copy-Item -Path "C:\Users\user\Documents\repos\os-setup\linux" -Destination "\\w
 ```bash
 sudo apt update -y && sudo apt install dos2unix && find . -type f -exec dos2unix {} \; && bash bootstrap.sh
 ```
+
+1. After installation reopen your terminal for changes to take effect.
+
+## vscode plugins
+
+Needs to be installed manually right now. Suggested plugins:
+
+- NewLine
+- Rainbow CSV
+- Rewrap
+- Trailing Whitespace
+- Prettier
