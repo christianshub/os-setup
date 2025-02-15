@@ -1,0 +1,5 @@
+- name: Install and configure zsh
+  ansible.builtin.include_tasks: "zsh.yaml"
+
+- name: Install kubectl, kubectx, kubens, fzf, terrform, git-delta, kubecolor, helm,docker, yq
+  ansible.builtin.include_tasks: "homebrew.yaml"

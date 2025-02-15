@@ -1,0 +1,50 @@
+- name: Install dependencies for Homebrew
+  apt:
+    name:
+      - build-essential
+      - procps
+      - curl
+      - file
+      - git
+    update_cache: yes
+  become: yes
+
+- name: Check if Homebrew is installed
+  ansible.builtin.stat:
+    path: /home/linuxbrew/.linuxbrew/bin/brew
+  register: brew_installed
+
+- name: Download and run the Homebrew installer
+  ansible.builtin.shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    creates: /home/linuxbrew/.linuxbrew/bin/brew
+  become: false
+  when: not brew_installed.stat.exists
+
+- name: Add Homebrew to zshrc
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.zshrc"
+    line: 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    create: yes
+
+- name: Ensure brew command is available in PATH
+  ansible.builtin.shell: echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >> "/home/{{ username }}/.zshrc"
+  args:
+    executable: /bin/bash
+
+- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, and yq via Homebrew (takes some time)
+  community.general.homebrew:
+    name:
+      - kubectl
+      - kubectx # kubens is included with this
+      - fzf
+      - terraform
+      - git-delta
+      - kubecolor
+      - helm
+      - docker
+      - yq
+    state: present
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
+  become: false

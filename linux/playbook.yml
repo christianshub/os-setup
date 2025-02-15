@@ -19,7 +19,7 @@
           - pass
           - xorriso
         state: present
-    
+
     - name: Purge unwanted services
       apt:
         name:
@@ -31,8 +31,6 @@
 
   roles:
     - role: common
-  vars_files:
-    - variables.yml
   vars_prompt:
     - name: "username"
       prompt: "Enter your username"

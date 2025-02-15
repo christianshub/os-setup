@@ -24,11 +24,11 @@
 
 - name: Ensure .zshrc is owned by the user
   ansible.builtin.file:
-    path: "/home/{{ username }}/.zshrc"  # Path to .zshrc
+    path: "/home/{{ username }}/.zshrc" # Path to .zshrc
     owner: "{{ username }}"
     group: "{{ username }}"
-    state: file  # Ensures that the file exists; use 'touch' if the file might not exist
- 
+    state: file # Ensures that the file exists; use 'touch' if the file might not exist
+
 - name: Download autosuggestion
   command: "git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~{{ username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
   args:
@@ -40,5 +40,3 @@
   args:
     chdir: "~{{ username }}"
     creates: "~{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
-
-

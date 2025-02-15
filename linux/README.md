@@ -1,31 +1,42 @@
 # Ansible Ubuntu Setup
 
-## Prerequisites
-
-* Ubuntu 22.04
-* AMD64 architecture, Windows 11 host PC
+Installs packages and plugins relevant to an engineer working with Kubernetes.
 
 ## Features
 
-Edit the [variables](variables.yml) file to enable/disable features this playbook provides
+Packages and plugins:
 
-Features:
-* ✅ Zsh
-* ✅ Kubectl
-* ✅ Apt-packages: yq, jq, python3, telnet, unzip, direnv, openssl, plocate 
-* ✅ Docker
-* ✅ Helm
-* ✅ Terraform
-* ✅ Kubectx
-* ✅ Kubens
-* ✅ Kubecolor
-* ✅ git-delta
+- ✅ Zsh
+- ✅ Kubectl
+- ✅ Golang
+- ✅ Apt-packages: yq, jq, python3, telnet, unzip, direnv, openssl, plocate, ca-certificates, curl, wget, pass, xorriso
+- ✅ Docker
+- ✅ Helm
+- ✅ Terraform
+- ✅ Fzf
+- ✅ Kubectx
+- ✅ Kubens
+- ✅ Kubecolor
+- ✅ git-delta
+
+## TODO
+
+- Create GPG ready to be exported to GitHub
+
+## Prerequisites
+
+- Ubuntu 22.04
+- AMD64 architecture, Windows 11 host PC
 
 ## Install
 
 1. Download or clone this repo
 1. cd to the root of this repo
 1. Run `sudo apt update -y && sudo apt install dos2unix && find . -type f -exec dos2unix {} \; && bash bootstrap.sh`
+
+```bash
+sudo apt update -y && sudo apt install dos2unix && find . -type f -exec dos2unix {} \; && bash bootstrap.sh
+```
 
 ### WSL
 
@@ -34,4 +45,12 @@ Features:
 
 ```Powershell
 Copy-Item -Path "C:\Users\user\Documents\repos\os-setup\linux" -Destination "\\wsl.localhost\Ubuntu-22.04\home\user" -Recurse -Force
+```
+
+> Note, the \<user\> name may be different from what you have chosen
+
+1. From within your Ubuntu Distro, go to the copied folder and run:
+
+```bash
+sudo apt update -y && sudo apt install dos2unix && find . -type f -exec dos2unix {} \; && bash bootstrap.sh
 ```
