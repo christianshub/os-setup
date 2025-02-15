@@ -69,3 +69,4 @@ Needs to be installed manually right now. Suggested plugins:
 - Rewrap
 - Trailing Whitespace
 - Prettier
+- Rainglow (theme: darkside)
