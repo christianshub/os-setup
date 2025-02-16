@@ -19,6 +19,7 @@ Packages and plugins:
 - ✅ Kubens
 - ✅ Kubecolor
 - ✅ git-delta
+- ✅ Packer
 
 ## TODO
 

@@ -32,7 +32,7 @@
   args:
     executable: /bin/bash
 
-- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, and yq via Homebrew (takes some time)
+- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, yq and Packer via Homebrew (takes some time)
   community.general.homebrew:
     name:
       - kubectl
@@ -44,6 +44,14 @@
       - helm
       - docker
       - yq
+    state: present
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
+  become: false
+
+- name: Install Packer from HashiCorp tap
+  community.general.homebrew:
+    name: hashicorp/tap/packer
     state: present
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
