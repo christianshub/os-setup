@@ -26,17 +26,27 @@
     path: "/home/{{ username }}/.zshrc"
     line: 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
     create: yes
+    state: present
 
 - name: Ensure brew command is available in PATH
-  ansible.builtin.shell: echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >> "/home/{{ username }}/.zshrc"
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.zshrc"
+    line: 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"'
+    create: yes
+    state: present
+
+- name: Reload shell environment for Homebrew
+  shell: eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
   args:
     executable: /bin/bash
 
-- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, yq and Packer via Homebrew (takes some time)
+- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, yq, and Kustomize via Homebrew
   community.general.homebrew:
     name:
       - kubectl
-      - kubectx # kubens is included with this
+      - kubectx
       - fzf
       - terraform
       - git-delta
@@ -44,6 +54,7 @@
       - helm
       - docker
       - yq
+      - kustomize
     state: present
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
