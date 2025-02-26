@@ -42,7 +42,7 @@
   args:
     executable: /bin/bash
 
-- name: Install kubectl, kubectx, kubens, fzf, Terraform, git-delta, kubecolor, Helm, Docker, yq, and Kustomize via Homebrew
+- name: Install Flux and other necessary tools via Homebrew
   community.general.homebrew:
     name:
       - kubectl
@@ -55,6 +55,7 @@
       - docker
       - yq
       - kustomize
+      - fluxcd/tap/flux # ✅ Flux CLI
     state: present
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
