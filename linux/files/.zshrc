@@ -64,7 +64,7 @@ reset()
 }
 
 alias kubectl=kubecolor
-compdef kubecolor=kubectl 
+compdef kubecolor=kubectl
 alias kc='kubectx'
 alias k='kubectl'
 alias f="fzf"
@@ -72,5 +72,6 @@ alias kn='kubens'
 alias swiss-up='kubectl run -it swiss-up --image=busybox --bash'
 alias swiss-down='kubectl delete pod swiss-army-knife'
 alias ml='docker run -it --rm --name megalinter -v $(pwd)/:/tmp/lint docker.io/oxsecurity/megalinter-terraform:v8.5.0'
+alias treeall='tree -I '__pycache__' -I '.git' -I '.venv' -I 'node_modules' | tee structure.txt && find . -type f ! -path "./structure.txt" -exec echo -e "\n--- {} ---" \; -exec cat {} \; >> structure.txt'
 
 PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(
