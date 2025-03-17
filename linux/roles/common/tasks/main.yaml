@@ -3,3 +3,6 @@
 
 - name: Install kubectl, kubectx, kubens, fzf, terrform, git-delta, kubecolor, helm,docker, yq
   ansible.builtin.include_tasks: "homebrew.yaml"
+
+- name: Install Docker
+  ansible.builtin.include_tasks: "docker.yaml"

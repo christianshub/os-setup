@@ -52,7 +52,6 @@
       - git-delta
       - kubecolor
       - helm
-      - docker
       - yq
       - jq
       - kustomize
