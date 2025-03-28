@@ -1,0 +1,33 @@
+---
+extends: default
+
+rules:
+
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 1
+    level: error
+  
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: 1
+    level: error
+  
+  document-start: disable
+
+  empty-lines:
+    max: 1
+    max-start: 0
+    max-end: 0
+
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    indent-multi-line-strings: false
+    level: error
+
+  line-length: disable
+
+  new-lines:
+    type: unix

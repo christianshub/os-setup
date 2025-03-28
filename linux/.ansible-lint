@@ -1,0 +1,14 @@
+skip_list:
+    - yaml[line-length]
+    - "403"
+    - "104"
+    - "204"
+    - "106"
+    - "207"
+
+use_default_rules: true
+offline: true
+
+exclude_paths:
+    - .cache/ 
+    - .git/
