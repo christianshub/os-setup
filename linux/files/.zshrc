@@ -3,8 +3,6 @@ if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-export PATH=$PATH:/home/user/go/bin
-
 # export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/config-dev:$HOME/.kube/config-prod
 
 # Ensure fzf, direnv, and Homebrew shellenv are loaded correctly
@@ -16,6 +14,8 @@ export ZSH_THEME="simple"
 export KUBE_EDITOR="code --wait"
 export EDITOR="code --wait"
 export VISUAL="code --wait"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+
 
 plugins=(git kubectl kube-ps1 zsh-autosuggestions zsh-syntax-highlighting)
 
@@ -71,7 +71,7 @@ alias kc='kubectx'
 alias k='kubectl'
 alias f="fzf"
 alias kn='kubens'
-alias swiss-up='kubectl run -it swiss-up --image=busybox --bash'
+alias swiss-up='kubectl run -it --rm swiss-army-knife --image=rancherlabs/swiss-army-knife:latest --restart=Never -- /bin/bash'
 alias swiss-down='kubectl delete pod swiss-army-knife'
 alias ml='docker run -it --rm --name megalinter -v $(pwd)/:/tmp/lint docker.io/oxsecurity/megalinter-terraform:v8.5.0'
 alias treeall='tree -I '__pycache__' -I '.git' -I '.venv' -I 'node_modules' | tee structure.txt && find . -type f ! -path "./structure.txt" -exec echo -e "\n--- {} ---" \; -exec cat {} \; >> structure.txt'
