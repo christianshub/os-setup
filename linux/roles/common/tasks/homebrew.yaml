@@ -57,7 +57,8 @@
       - kustomize
       - fluxcd/tap/flux
       - kyverno
-      - gh # github cli
+      - gh
+      - python3
     state: present
   environment:
     PATH: "/home/linuxbrew/.linuxbrew/bin:{{ ansible_env.PATH }}"
