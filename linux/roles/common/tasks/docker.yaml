@@ -4,31 +4,46 @@
       - ca-certificates
       - curl
       - gnupg
+      - lsb-release
     state: present
     update_cache: yes
   become: yes
 
-- name: Add Docker's official GPG key
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Download and dearmor Docker GPG key
   shell: |
-    sudo install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.gpg > /dev/null
-    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   args:
     creates: /etc/apt/keyrings/docker.gpg
   become: yes
 
+- name: Set permissions on Docker GPG key
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
+  become: yes
+
 - name: Add Docker repository
   shell: |
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
   args:
     creates: /etc/apt/sources.list.d/docker.list
   become: yes
 
-- name: Update APT cache after adding Docker repo
+- name: Update APT cache
   apt:
     update_cache: yes
+  become: yes
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
   become: yes
 
 - name: Install Docker and dependencies
