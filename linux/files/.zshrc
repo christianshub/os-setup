@@ -74,6 +74,8 @@ alias kn='kubens'
 alias swiss-up='kubectl run -it --rm swiss-army-knife --image=rancherlabs/swiss-army-knife:latest --restart=Never -- /bin/bash'
 alias swiss-down='kubectl delete pod swiss-army-knife'
 alias ml='docker run -it --rm --name megalinter -v $(pwd)/:/tmp/lint docker.io/oxsecurity/megalinter-terraform:v8.5.0'
-alias treeall='tree -I '__pycache__' -I '.git' -I '.venv' -I 'node_modules' | tee structure.txt && find . -type f ! -path "./structure.txt" -exec echo -e "\n--- {} ---" \; -exec cat {} \; >> structure.txt'
+alias treeall='tree -I "__pycache__|.git|.venv|node_modules" | tee structure.txt && find . -type f ! -path "./structure.txt" ! -path "*/.git/*" ! -path "*/.venv/*" ! -path "*/node_modules/*" ! -path "*/__pycache__/*" -exec echo -e "\n--- {} ---" \; -exec cat {} \; >> structure.txt'
 
 PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
