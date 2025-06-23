@@ -3,7 +3,7 @@ if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/config-dev:$HOME/.kube/config-prod
+export KUBECONFIG=$HOME/.kube/kairos.yaml:$HOME/.kube/config
 
 # Ensure fzf, direnv, and Homebrew shellenv are loaded correctly
 eval "$(fzf --zsh)"
