@@ -1,0 +1,38 @@
+---
+# roles/common/tasks/vscode.yaml
+
+- name: Install prerequisites for HTTPS APT repos
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: yes
+  when: ansible_facts.virtualization_type != 'wsl'
+
+- name: Add Microsoft GPG key
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  when: ansible_facts.virtualization_type != 'wsl'
+
+- name: Add Visual Studio Code APT repository
+  apt_repository:
+    repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main'
+    state: present
+    filename: microsoft-vscode
+  when: ansible_facts.virtualization_type != 'wsl'
+
+- name: Update apt cache after adding VS Code repo
+  apt:
+    update_cache: yes
+  when: ansible_facts.virtualization_type != 'wsl'
+
+- name: Install Visual Studio Code
+  apt:
+    name: code
+    state: present
+  when: ansible_facts.virtualization_type != 'wsl'
+

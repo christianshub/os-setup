@@ -13,11 +13,10 @@
     dest: /home/{{ username }}/.zshrc
 
 - name: Set zsh as default shell for user
+  user:
+    name: "{{ username }}"
+    shell: /bin/zsh
   become: true
-  become_user: "{{ username }}"
-  shell: chsh -s /bin/zsh
-  args:
-    executable: /bin/bash
 
 - name: Download and install oh-my-zsh framework
   command: "git clone -c core.autocrlf=input --depth=1 https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh"
@@ -44,3 +43,18 @@
   args:
     chdir: "~{{ username }}"
     creates: "~{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+- name: Ensure non-login shells exec into zsh
+  become: false
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.bashrc"
+    insertafter: EOF
+    line: |
+      # hand off from Bash to Zsh
+      if [ -t 1 ] && [ -n "$BASH_VERSION" ] && [ "$SHELL" != "/bin/zsh" ]; then
+        exec zsh -l
+      fi
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    create: yes
+

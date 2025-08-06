@@ -6,6 +6,9 @@
 
 - name: Install Docker
   ansible.builtin.include_tasks: "docker.yaml"
+  
+- name: Install vscode
+  ansible.builtin.include_tasks: "vscode.yaml"
 
 - name: Install k8s-node-gate.sh to /usr/local/bin
   copy:

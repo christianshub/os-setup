@@ -50,6 +50,7 @@
       - fzf
       - terraform
       - git-delta
+      - git-color
       - kubecolor
       - helm
       - yq
