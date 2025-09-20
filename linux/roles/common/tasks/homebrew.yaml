@@ -1,0 +1,115 @@
+- name: Install dependencies for Homebrew
+  ansible.builtin.apt:
+    name:
+      - build-essential
+      - procps
+      - curl
+      - file
+      - git
+      - ca-certificates
+    update_cache: yes
+    state: present
+  become: yes
+
+- name: Check if Homebrew is installed
+  ansible.builtin.stat:
+    path: /home/linuxbrew/.linuxbrew/bin/brew
+  register: brew_installed
+
+- name: Download and run the Homebrew installer
+  ansible.builtin.shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    creates: /home/linuxbrew/.linuxbrew/bin/brew
+  become: false
+  when: not brew_installed.stat.exists
+
+- name: Fix ownership of Linuxbrew prefix and caches
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    recurse: yes
+    state: directory
+  loop:
+    - /home/linuxbrew/.linuxbrew
+    - "/home/{{ username }}/.cache/Homebrew"
+    - "/home/{{ username }}/.config"
+    - "/home/{{ username }}/.local/share"
+  become: yes
+
+- name: Set Homebrew facts
+  ansible.builtin.set_fact:
+    brew_prefix: /home/linuxbrew/.linuxbrew
+    brew_bin: /home/linuxbrew/.linuxbrew/bin/brew
+    brew_env:
+      PATH: "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:{{ ansible_env.PATH }}"
+      HOMEBREW_NONINTERACTIVE: "1"
+      HOMEBREW_NO_ENV_FILTERING: "1"
+      HOMEBREW_NO_INSTALL_FROM_API: "1"
+      GIT_TERMINAL_PROMPT: "0"
+
+- name: Add Homebrew to zshrc (shellenv)
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.zshrc"
+    line: 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    create: yes
+    state: present
+  become: false
+
+- name: Ensure brew command is available in PATH (zshrc)
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.zshrc"
+    line: 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"'
+    create: yes
+    state: present
+  become: false
+
+- name: Initialize Homebrew shellenv for this run
+  ansible.builtin.shell: eval "$({{ brew_bin }} shellenv)"
+  environment: "{{ brew_env }}"
+  args: { executable: /bin/bash }
+  become: false
+  changed_when: false
+
+- name: Ensure taps parent dirs exist
+  ansible.builtin.file:
+    path: "{{ brew_prefix }}/Homebrew/Library/Taps/{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0755"
+    recurse: yes
+  loop:
+    - fluxcd
+    - hashicorp
+    - kyverno-io
+    - hidetatz
+  become: yes
+
+- name: Brew update (quiet)
+  ansible.builtin.command: "{{ brew_bin }} update --force --quiet"
+  environment: "{{ brew_env }}"
+  become: false
+  changed_when: false
+
+- name: Install core tools via Homebrew
+  community.general.homebrew:
+    name:
+      - kubectl
+      - kubectx
+      - terraform
+      - git-delta
+      - kubecolor
+      - helm
+      - yq
+      - jq
+      - kustomize
+      - fluxcd/tap/flux
+      - kyverno
+      - gh
+      - python3
+    state: present
+    update_homebrew: false
+    path: "{{ brew_bin }}"
+  environment: "{{ brew_env }}"
+  become: false

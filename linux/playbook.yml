@@ -1,0 +1,37 @@
+- name: Playbook
+  hosts: localhost
+  become: true
+  pre_tasks:
+    - name: Update and upgrade system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install required packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - wget
+          - python3
+          - unzip
+          - direnv
+          - pass
+          - xorriso
+        state: present
+
+    - name: Purge unwanted services
+      apt:
+        name:
+          - ubuntu-report
+          - popularity-contest
+          - apport
+          - whoopsie
+        state: absent
+
+  roles:
+    - role: common
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter your username"
+      private: false

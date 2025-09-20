@@ -1,0 +1,60 @@
+- name: Install zsh, git, curl
+  apt:
+    name:
+      - zsh
+      - git
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Copy .zshrc file
+  copy:
+    src: ./files/.zshrc
+    dest: /home/{{ username }}/.zshrc
+
+- name: Set zsh as default shell for user
+  user:
+    name: "{{ username }}"
+    shell: /bin/zsh
+  become: true
+
+- name: Download and install oh-my-zsh framework
+  command: "git clone -c core.autocrlf=input --depth=1 https://github.com/robbyrussell/oh-my-zsh.git .oh-my-zsh"
+  become_user: "{{ username }}"
+  args:
+    chdir: "~{{ username }}"
+    creates: "~{{ username }}/.oh-my-zsh"
+
+- name: Ensure .zshrc is owned by the user
+  ansible.builtin.file:
+    path: "/home/{{ username }}/.zshrc" # Path to .zshrc
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    state: file # Ensures that the file exists; use 'touch' if the file might not exist
+
+- name: Download autosuggestion
+  command: "git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~{{ username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  args:
+    chdir: "~{{ username }}"
+    creates: "~{{ username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+
+- name: Download syntax highlighting
+  command: "git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+  args:
+    chdir: "~{{ username }}"
+    creates: "~{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+- name: Ensure non-login shells exec into zsh
+  become: false
+  ansible.builtin.lineinfile:
+    path: "/home/{{ username }}/.bashrc"
+    insertafter: EOF
+    line: |
+      # hand off from Bash to Zsh
+      if [ -t 1 ] && [ -n "$BASH_VERSION" ] && [ "$SHELL" != "/bin/zsh" ]; then
+        exec zsh -l
+      fi
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    create: yes
+

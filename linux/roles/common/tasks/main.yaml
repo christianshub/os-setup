@@ -1,0 +1,19 @@
+- name: Install and configure zsh
+  ansible.builtin.include_tasks: "zsh.yaml"
+
+- name: Install kubectl, kubectx, kubens, fzf, terrform, git-delta, kubecolor, helm,docker, yq
+  ansible.builtin.include_tasks: "homebrew.yaml"
+
+- name: Install Docker
+  ansible.builtin.include_tasks: "docker.yaml"
+  
+- name: Install vscode
+  ansible.builtin.include_tasks: "vscode.yaml"
+
+- name: Install k8s-node-gate.sh to /usr/local/bin
+  copy:
+    src: k8s-node-gate.sh
+    dest: /usr/local/bin/k8s-node-gate.sh
+    mode: "0755"
+    owner: root
+    group: root
