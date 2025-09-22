@@ -65,6 +65,24 @@ reset()
   git reset $(git merge-base master $(git branch --show-current))
 }
 
+cleancommit() {
+  echo "⚠️  This will erase all history on the current branch and replace it with a single 'Initial commit'."
+  read -q "REPLY?Are you sure you want to continue? (y/n) "
+  echo
+  if [[ "$REPLY" == "y" || "$REPLY" == "Y" ]]; then
+    b=$(git rev-parse --abbrev-ref HEAD)
+    git branch "$b-backup" "$b"
+    git checkout --orphan tmp-reset
+    git add -A
+    git commit -m "Initial commit"
+    git branch -M "$b"
+    git push -f origin "$b"
+    echo "✅ Branch '$b' has been reset. A backup was saved as '$b-backup'."
+  else
+    echo "❌ Aborted."
+  fi
+}
+
 alias kubectl=kubecolor
 compdef kubecolor=kubectl
 alias kc='kubectx'
