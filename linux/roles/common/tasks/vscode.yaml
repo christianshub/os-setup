@@ -1,0 +1,75 @@
+---
+# roles/common/tasks/vscode.yaml
+
+- name: Read kernel osrelease for WSL detection
+  ansible.builtin.command: cat /proc/sys/kernel/osrelease
+  register: kernel_osrelease
+  changed_when: false
+  failed_when: false
+
+- name: Detect WSL/WSL2
+  ansible.builtin.set_fact:
+    is_wsl: >-
+      {{
+        (ansible_facts.virtualization_type | default('') | lower) in ['wsl', 'wsl2']
+        or ('microsoft' in (ansible_facts.kernel_release | default('') | lower))
+        or ('microsoft' in (kernel_osrelease.stdout | default('') | lower))
+        or (ansible_env.WSL_DISTRO_NAME is defined)
+        or (ansible_env.WSL_INTEROP is defined)
+      }}
+  changed_when: false
+
+- name: Remove Visual Studio Code on WSL
+  apt:
+    name: code
+    state: absent
+    purge: true
+  when: is_wsl
+
+- name: Remove Visual Studio Code APT repository on WSL
+  apt_repository:
+    repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main'
+    state: absent
+    filename: microsoft-vscode
+  when: is_wsl
+
+- name: Remove Microsoft GPG key on WSL
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: absent
+  when: is_wsl
+
+- name: Install prerequisites for HTTPS APT repos
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: yes
+  when: not is_wsl
+
+- name: Add Microsoft GPG key
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  when: not is_wsl
+
+- name: Add Visual Studio Code APT repository
+  apt_repository:
+    repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main'
+    state: present
+    filename: microsoft-vscode
+  when: not is_wsl
+
+- name: Update apt cache after adding VS Code repo
+  apt:
+    update_cache: yes
+  when: not is_wsl
+
+- name: Install Visual Studio Code
+  apt:
+    name: code
+    state: present
+  when: not is_wsl

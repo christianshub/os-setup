@@ -1,0 +1,109 @@
+# Load Homebrew first to ensure installed binaries are available
+if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Auto-build KUBECONFIG from everything kubeconfig-like in ~/.kube/.
+# Re-run `kubeconfig-reload` after adding/removing kubeconfigs, or open a new shell.
+kubeconfig-reload() {
+  local -a _kc=( ~/.kube/config(N) ~/.kube/*.yaml(N) ~/.kube/*-kubeconfig(N) )
+  export KUBECONFIG="${(j[:])_kc}"
+}
+kubeconfig-reload
+
+# Ensure fzf, direnv, and Homebrew shellenv are loaded correctly
+eval "$(direnv hook zsh)"
+
+export ZSH="$HOME/.oh-my-zsh"
+export ZSH_THEME="simple"
+export KUBE_EDITOR="code --wait"
+export EDITOR="code --wait"
+export VISUAL="code --wait"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+
+# Let gpg-agent/pinentry-curses prompt on the active terminal for pass.
+if [[ -t 1 ]]; then
+  export GPG_TTY=$(tty)
+  gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+fi
+
+
+plugins=(git kubectl kube-ps1 zsh-autosuggestions zsh-syntax-highlighting)
+
+# Load kubectl completion AFTER Homebrew is available
+if command -v kubectl &> /dev/null; then
+  source <(kubectl completion zsh)
+fi
+
+source $ZSH/oh-my-zsh.sh
+
+fetch() {
+  git fetch
+}
+
+pull () {
+  git pull
+}
+
+push() {
+  local message=""
+
+  if [ -z "$1" ]; then
+    message="WIP"
+  else
+    message="$1"
+  fi
+
+    git add -A
+    git commit -m "$message"
+    push_output=$(git push --force 2>&1)
+    push_status=$?
+
+    if [[ $push_status -ne 0 && $push_output == *"has no upstream branch"* ]]; then
+        local branch_name=$(git rev-parse --abbrev-ref HEAD)
+        echo "Setting upstream branch to 'origin/$branch_name' and pushing ..."
+
+        git push --set-upstream origin $branch_name --force
+    elif [[ $push_status -ne 0 ]]; then
+        echo "An error occurred while pushing: $push_output"
+    else
+        echo "Pushed successfully"
+    fi
+}
+
+reset()
+{
+  git reset $(git merge-base master $(git branch --show-current))
+}
+
+cleancommit() {
+  echo "⚠️  This will erase all history on the current branch and replace it with a single 'Initial commit'."
+  read -q "REPLY?Are you sure you want to continue? (y/n) "
+  echo
+  if [[ "$REPLY" == "y" || "$REPLY" == "Y" ]]; then
+    b=$(git rev-parse --abbrev-ref HEAD)
+    git branch "$b-backup" "$b"
+    git checkout --orphan tmp-reset
+    git add -A
+    git commit -m "Initial commit"
+    git branch -M "$b"
+    git push -f origin "$b"
+    echo "✅ Branch '$b' has been reset. A backup was saved as '$b-backup'."
+  else
+    echo "❌ Aborted."
+  fi
+}
+
+alias kubectl=kubecolor
+compdef kubecolor=kubectl
+alias kc='kubectx'
+alias k='kubectl'
+alias kn='kubens'
+alias swiss-up='kubectl run -it --rm swiss-army-knife --image=rancherlabs/swiss-army-knife:latest --restart=Never -- /bin/bash'
+alias swiss-down='kubectl delete pod swiss-army-knife'
+alias ml='docker run -it --rm --name megalinter -v $(pwd)/:/tmp/lint docker.io/oxsecurity/megalinter-terraform:v8.5.0'
+alias treeall='tree -I "__pycache__|.git|.venv|node_modules" | tee structure.txt && find . -type f ! -path "./structure.txt" ! -path "*/.git/*" ! -path "*/.venv/*" ! -path "*/node_modules/*" ! -path "*/__pycache__/*" -exec echo -e "\n--- {} ---" \; -exec cat {} \; >> structure.txt'
+
+PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
